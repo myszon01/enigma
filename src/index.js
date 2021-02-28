@@ -4,9 +4,9 @@ const readline = require("readline");
 
 const Generator = require('./Generator');
 
-const generateKeysAndSaveToFolder = (numOfshards, folderPath) => {
+const generateKeysAndSaveToFolder = (numOfShares, folderPath) => {
 
-    const {publicKey, privateKeyshards} = Generator.generatePublicKeyAndPrivateKeyShards(numOfshards);
+    const {publicKey, privateKeyShares} = Generator.generatePublicKeyAndPrivateKeyShards(numOfShares);
 
     const publicKeyFilePath = `${folderPath}/public.txt`
     fs.writeFileSync(publicKeyFilePath, publicKey, function(err, data) {
@@ -15,12 +15,12 @@ const generateKeysAndSaveToFolder = (numOfshards, folderPath) => {
     console.log(`Public key saved in: ${publicKeyFilePath}`) 
             
             
-    privateKeyshards.forEach((shards, i) => {
+    privateKeyShares.forEach((shares, i) => {
         const filePath = `${folderPath}/private[${i}].txt`
-        fs.writeFileSync(filePath, shards, function(err, data) {
+        fs.writeFileSync(filePath, shares, function(err, data) {
             if (err) throw err;
         });
-        console.log(`Private shard ${i} key saved in: ${filePath}`) 
+        console.log(`Private share ${i} key saved in: ${filePath}`) 
     });
 }
 
@@ -31,13 +31,13 @@ const encriptDataWithPublicKey = (data, publicKeyFilePath) => {
     return Generator.encriptPublic(data, retrivedPublicKey);
 }
 
-const decriptDataWithPrivateKeyshards = (data, pathToPrivateKeyShard) => {
-    const retrivedShard = pathToPrivateKeyShard.map((filePath) => {
+const decriptDataWithPrivateKeyShares = (data, pathToPrivateKeyShar) => {
+    const retrivedShare = pathToPrivateKeyShar.map((filePath) => {
         return fs.readFileSync(filePath, function(err, data) {
             if (err) throw err;
           });
     });
-    const privateKey = Generator.assemblePrivateKey(retrivedShard)
+    const privateKey = Generator.assemblePrivateKey(retrivedShare)
     return Generator.decriptData(data, privateKey)
 }
 
@@ -49,7 +49,7 @@ const rl = readline.createInterface({
 const options = 
     '\n 1. Generate Keys ' +
     '\n 2. Encript msg using public key' +
-    '\n 3. Decript msg using private shards' 
+    '\n 3. Decript msg using private shares' 
 
 
 const welcomeStage = (msg) => rl.question(msg, function(option) {
@@ -61,13 +61,13 @@ const welcomeStage = (msg) => rl.question(msg, function(option) {
                 if (!folderPath || folderPath == ''){
                     folderPath = `./tmp`
                 }
-                rl.question("How many shards would you like to devide your private key? (default 5)", function(numOfshards) {
-                    numOfshards = parseInt(numOfshards)
-                    if(!numOfshards || numOfshards < 2) {
-                        numOfshards = 5
+                rl.question("How many shares would you like to devide your private key? (default 5)", function(numOfShares) {
+                    numOfShares = parseInt(numOfShares)
+                    if(!numOfShares || numOfShares < 2) {
+                        numOfShares = 5
                     }
                     try {
-                        generateKeysAndSaveToFolder(numOfshards, folderPath);
+                        generateKeysAndSaveToFolder(numOfShares, folderPath);
                     } catch(err) {
                         console.error(`Something went wrong check error and try again.`, err)
                     } finally {
@@ -98,13 +98,13 @@ const welcomeStage = (msg) => rl.question(msg, function(option) {
         };
         case '3': {
             rl.question("What is the msg you would like to decript?", function(msg) {
-                rl.question("Path to you prvate shards? Seperate by ; (default ./tmp/private[0].txt;./tmp/private[1].txt)", function(pathToPrivateKeyShar) {
+                rl.question("Path to you prvate shares? Seperate by ; (default ./tmp/private[0].txt;./tmp/private[1].txt)", function(pathToPrivateKeyShar) {
                     if(!pathToPrivateKeyShar || pathToPrivateKeyShar === '') {
                         pathToPrivateKeyShar = './tmp/private[0].txt;./tmp/private[1].txt'
                     }
                     pathToPrivateKeyShar = pathToPrivateKeyShar.split(';');
                     try {
-                        console.log(`Your decripted msg is: \n${decriptDataWithPrivateKeyshards(msg, pathToPrivateKeyShar)}`);
+                        console.log(`Your decripted msg is: \n${decriptDataWithPrivateKeyShares(msg, pathToPrivateKeyShar)}`);
                     } catch(err) {
                         console.error(`Something went wrong check error and try again.`, err)
                     } finally {
